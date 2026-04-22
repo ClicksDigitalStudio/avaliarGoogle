@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Desafio da Foto Editada – Clicks Digital Studio</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #fdf6f8;
+      min-height: 100vh;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      padding: 24px 16px;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 480px;
+    }
+
+    /* ── Botões gerais ── */
+    .btn-principal {
+      display: block;
+      width: 100%;
+      padding: 14px;
+      font-size: 16px;
+      font-weight: 600;
+      background: #c97a8a;
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      text-align: center;
+      text-decoration: none;
+      transition: background 0.2s, transform 0.1s;
+    }
+    .btn-principal:hover  { background: #b5687a; }
+    .btn-principal:active { transform: scale(0.98); }
+
+    .btn-secundario {
+      display: block;
+      width: 100%;
+      padding: 12px;
+      font-size: 14px;
+      background: transparent;
+      border: 1px solid #ddd;
+      border-radius: 12px;
+      cursor: pointer;
+      color: #888;
+      margin-top: 10px;
+      transition: background 0.2s;
+    }
+    .btn-secundario:hover { background: #f5f5f5; }
+
+    /* ── Card ── */
+    .card {
+      background: #f2eaec;
+      border-radius: 14px;
+      padding: 18px 20px;
+      margin-bottom: 20px;
+    }
+
+    /* ── Tela intro ── */
+    .intro-topo {
+      text-align: center;
+      padding: 28px 16px 0;
+    }
+    .intro-topo .icone { font-size: 40px; margin-bottom: 10px; }
+    .intro-topo h1 { font-size: 22px; font-weight: 600; color: #2b1d22; margin-bottom: 4px; }
+    .intro-topo .subtitulo { font-size: 13px; color: #9b7a84; margin-bottom: 24px; }
+
+    .card-info p { font-size: 14px; color: #7a5a63; margin-bottom: 4px; }
+    .card-info .titulo { font-size: 15px; font-weight: 600; color: #2b1d22; margin-bottom: 10px; }
+
+    /* ── Barra de progresso ── */
+    .barra-wrap {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+    .barra-fundo {
+      flex: 1;
+      height: 7px;
+      background: #f2eaec;
+      border-radius: 99px;
+      overflow: hidden;
+    }
+    .barra-fill {
+      height: 100%;
+      background: #c97a8a;
+      border-radius: 99px;
+      transition: width 0.4s ease;
+      width: 0%;
+    }
+    .barra-txt {
+      font-size: 12px;
+      color: #b09299;
+      white-space: nowrap;
+    }
+
+    /* ── Pergunta ── */
+    .card-pergunta {
+      background: #f2eaec;
+      border-radius: 14px;
+      padding: 18px 20px;
+      margin-bottom: 16px;
+    }
+    .card-pergunta p {
+      font-size: 15px;
+      font-weight: 500;
+      color: #2b1d22;
+      line-height: 1.55;
+    }
+
+    .opcoes { display: flex; flex-direction: column; gap: 10px; }
+
+    .btn-opcao {
+      padding: 13px 16px;
+      text-align: left;
+      font-size: 14px;
+      border: 1px solid #e0d0d5;
+      border-radius: 10px;
+      background: #fff;
+      cursor: pointer;
+      color: #3a2a30;
+      transition: background 0.15s, border-color 0.15s;
+      line-height: 1.4;
+    }
+    .btn-opcao:hover:not(:disabled) {
+      background: #fdf0f2;
+      border-color: #c97a8a;
+    }
+    .btn-opcao.correta {
+      background: #e8f5e9 !important;
+      border-color: #66bb6a !important;
+      color: #1b5e20 !important;
+      cursor: default;
+    }
+    .btn-opcao.errada {
+      background: #ffebee !important;
+      border-color: #ef9a9a !important;
+      color: #b71c1c !important;
+      cursor: default;
+    }
+    .btn-opcao:disabled { cursor: default; }
+
+    /* ── Feedback ── */
+    .feedback {
+      display: none;
+      margin-top: 14px;
+      padding: 14px 16px;
+      border-left: 3px solid #66bb6a;
+      border-radius: 0 10px 10px 0;
+      background: #e8f5e9;
+      font-size: 14px;
+      color: #2e7d32;
+      line-height: 1.5;
+    }
+    .feedback.aviso {
+      border-color: #ffca28;
+      background: #fff8e1;
+      color: #7a5900;
+    }
+
+    /* ── Resultado ── */
+    .resultado-topo {
+      text-align: center;
+      padding: 28px 16px 0;
+    }
+    .resultado-topo .icone { font-size: 48px; margin-bottom: 10px; }
+    .resultado-topo h2 { font-size: 22px; font-weight: 600; color: #2b1d22; margin-bottom: 6px; }
+    .resultado-topo p  { font-size: 14px; color: #9b7a84; margin-bottom: 24px; }
+
+    .card-passos .titulo { font-size: 15px; font-weight: 600; color: #2b1d22; margin-bottom: 12px; }
+    .card-passos p       { font-size: 14px; color: #7a5a63; margin-bottom: 5px; }
+
+    .oculto { display: none !important; }
+  </style>
+</head>
+<body>
+<div class="container">
+
+  <!-- ═══════════════════════════════ TELA INTRO ═══════════════════════════════ -->
+  <div id="tela-intro">
+    <div class="intro-topo">
+      <div class="icone">📸</div>
+      <h1>Clicks Digital Studio</h1>
+      <p class="subtitulo">Especialistas em fotografia de gestante</p>
+    </div>
+
+    <div class="card card-info">
+      <p class="titulo">🎁 Desafio da Foto Editada</p>
+      <p>✔ Responda 3 perguntas rápidas</p>
+      <p>✔ Complete em menos de 1 minuto</p>
+      <p>✔ Ganhe uma foto editada grátis</p>
+    </div>
+
+    <button class="btn-principal" onclick="iniciar()">Aceitar o Desafio →</button>
+  </div>
+
+  <!-- ═══════════════════════════════ TELA QUIZ ════════════════════════════════ -->
+  <div id="tela-quiz" class="oculto">
+    <div class="barra-wrap">
+      <div class="barra-fundo">
+        <div class="barra-fill" id="barra-fill"></div>
+      </div>
+      <span class="barra-txt" id="barra-txt">1 / 3</span>
+    </div>
+    <div id="quiz-corpo"></div>
+  </div>
+
+  <!-- ═══════════════════════════════ TELA RESULTADO ═══════════════════════════ -->
+  <div id="tela-resultado" class="oculto">
+    <div class="resultado-topo">
+      <div class="icone" id="res-emoji">🏆</div>
+      <h2 id="res-titulo">Você arrasou!</h2>
+      <p id="res-sub">Acertou tudo e ganhou sua foto editada!</p>
+    </div>
+
+    <div class="card card-passos">
+      <p class="titulo">Como resgatar sua foto editada:</p>
+      <p>1 — Clique no botão e vote, e comente a sua experiência no estúdio.</p>
+      <p>2 — Envie o print da avaliação para o nosso WhatsApp.</p>
+      <p>3 — Escolha sua foto extra na sua seleção.</p>
+    </div>
+
+    <a class="btn-principal"
+       href="https://g.page/r/CQttiqGdfjAGEBM/review"
+       target="_blank"
+       rel="noopener noreferrer">
+      ⭐ Avaliar no Google Agora
+    </a>
+
+    <div style="margin-top:18px;padding:14px 16px;border-radius:10px;background:#fff3e0;border-left:3px solid #ffb74d;font-size:13px;color:#7a4f00;line-height:1.6">
+      ⚠️ <strong>Promoção relâmpago.</strong> Este desafio é válido para uma única pessoa, referente a este ensaio. É intransferível (não pode ser repassado para outra pessoa).
+    </div>
+  </div>
+
+</div><!-- /container -->
+
+<script>
+  /* ─────────────── BANCO DE PERGUNTAS ─────────────── */
+  const perguntas = [
+    {
+      texto: "Qual a melhor época para fazer o ensaio de gestante?",
+      opcoes: ["4 a 5 meses", "6 a 8 meses", "No 9º mês", "Qualquer mês"],
+      correta: 1,
+      explicacao: "Entre 6 e 8 meses a barriga está bem definida e a mamãe ainda se movimenta com muito conforto!"
+    },
+    {
+      texto: "O que mais valoriza uma foto de gestante?",
+      opcoes: ["Flash forte e fundo branco", "Luz natural e ângulo certo", "Filtro intenso na edição", "Roupa colorida e chamativa"],
+      correta: 1,
+      explicacao: "A luz natural cria um brilho suave e realça a beleza do momento de forma única."
+    },
+    {
+      texto: "Qual sentimento uma boa foto de gestante deve transmitir?",
+      opcoes: ["Perfeição e glamour", "Amor, delicadeza e conexão", "Modernidade e estilo", "Alegria e energia"],
+      correta: 1,
+      explicacao: "Capturamos o amor entre a mãe e o bebê — esse é o verdadeiro segredo das nossas fotos!"
+    }
+  ];
+
+  /* ─────────────── ESTADO ─────────────── */
+  let atual    = 0;
+  let acertos  = 0;
+  let travado  = false;
+
+  /* ─────────────── FUNÇÕES ─────────────── */
+  function mostrar(id) {
+    ['tela-intro','tela-quiz','tela-resultado'].forEach(t => {
+      document.getElementById(t).classList.toggle('oculto', t !== id);
+    });
+  }
+
+  function iniciar() {
+    atual = 0; acertos = 0;
+    mostrar('tela-quiz');
+    renderPergunta();
+  }
+
+  function renderPergunta() {
+    travado = false;
+    const p   = perguntas[atual];
+    const pct = Math.round((atual / perguntas.length) * 100);
+
+    document.getElementById('barra-fill').style.width = pct + '%';
+    document.getElementById('barra-txt').textContent  = (atual + 1) + ' / ' + perguntas.length;
+
+    document.getElementById('quiz-corpo').innerHTML = `
+      <div class="card-pergunta">
+        <p>${p.texto}</p>
+      </div>
+      <div class="opcoes" id="opcoes">
+        ${p.opcoes.map((op, i) => `
+          <button class="btn-opcao" id="op-${i}" onclick="responder(${i})">${op}</button>
+        `).join('')}
+      </div>
+      <div class="feedback" id="feedback"></div>
+    `;
+  }
+
+  function responder(idx) {
+    if (travado) return;
+    travado = true;
+
+    const p      = perguntas[atual];
+    const acertou = (idx === p.correta);
+    if (acertou) acertos++;
+
+    /* Colorir botões */
+    for (let i = 0; i < p.opcoes.length; i++) {
+      const btn = document.getElementById('op-' + i);
+      btn.disabled = true;
+      if (i === p.correta)            btn.classList.add('correta');
+      else if (i === idx && !acertou) btn.classList.add('errada');
+    }
+
+    /* Feedback */
+    const fb = document.getElementById('feedback');
+    fb.style.display = 'block';
+    if (acertou) {
+      fb.classList.remove('aviso');
+      fb.innerHTML = `<strong>✓ Correto!</strong> ${p.explicacao}`;
+    } else {
+      fb.classList.add('aviso');
+      fb.innerHTML = `<strong>💡 Sabia que...</strong> ${p.explicacao}`;
+    }
+
+    /* Avançar */
+    setTimeout(() => {
+      atual++;
+      if (atual < perguntas.length) {
+        renderPergunta();
+      } else {
+        mostrarResultado();
+      }
+    }, 3800);
+  }
+
+  function mostrarResultado() {
+    document.getElementById('barra-fill').style.width = '100%';
+
+    const msgs = {
+      3: ['🏆', 'Você arrasou no desafio!',    'Acertou tudo — sua foto editada está garantida!'],
+      2: ['🎉', 'Muito bem!',                    'Acertou 2 de 3 — sua foto editada é sua!'],
+      1: ['👏', 'Desafio concluído!',            'Você participou e ganhou! Foto editada garantida.'],
+      0: ['🎁', 'Desafio concluído!',            'Todo participante ganha uma foto editada. 😊']
+    };
+    const [emoji, titulo, sub] = msgs[acertos] || msgs[0];
+
+    document.getElementById('res-emoji').textContent  = emoji;
+    document.getElementById('res-titulo').textContent = titulo;
+    document.getElementById('res-sub').textContent    = sub;
+
+    mostrar('tela-resultado');
+  }
+
+  function reiniciar() {
+    mostrar('tela-intro');
+  }
+</script>
+</body>
+</html>
